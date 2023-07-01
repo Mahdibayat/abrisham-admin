@@ -1,0 +1,23 @@
+.sideBarLink {
+  color: var(--sidebar-menu-item-color);
+  width: 100%;
+  height: 50px;
+  gap: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 1.1rem;
+  text-decoration: none !important;
+  transition: all 400ms;
+}
+
+.sideBarLink:active{
+  color: unset
+}
+
+.sideBarLink:hover {
+  color: white;
+}
+
+.sideBarLink.sideBarActive {
+  color: white;
+}

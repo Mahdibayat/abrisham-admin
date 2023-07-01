@@ -1,0 +1,17 @@
+.sidedBarLinks {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  padding: 15px;
+}
+
+.sidedBarOpen {
+  padding: 5px
+}
+
+.sidedBarLinks.sidedBarOpen a {
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

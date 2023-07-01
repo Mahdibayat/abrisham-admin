@@ -1,0 +1,10 @@
+.InputBase input{
+  min-height: 38px;
+  border-radius: 7px;
+  padding: 4px 10px;
+  transition: box-shadow 300ms;
+}
+
+.InputBase input:focus {
+  box-shadow: inset 0 0 3px 1px var(--primary-color)
+}

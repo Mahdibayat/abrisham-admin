@@ -1,0 +1,125 @@
+
+@font-face {
+	font-family: IRANSans;
+	font-style: normal;
+	font-weight: bold;
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_Bold.eot');
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_Bold.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */ url('./assets/fonts/IRANSans/woff2/IRANSansWeb(FaNum)_Bold.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/ url('./assets/fonts/IRANSans/woff/IRANSansWeb(FaNum)_Bold.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('./assets/fonts/IRANSans/ttf/IRANSansWeb(FaNum)_Bold.ttf') format('truetype');
+}
+@font-face {
+	font-family: IRANSans;
+	font-style: normal;
+	font-weight: 500;
+	src: url('./assets/fonts/IRANSans/eot/IRANSans(FaNum)_Medium.eot');
+	src: url('./assets/fonts/IRANSans/eot/IRANSans(FaNum)_Medium.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */ url('./assets/fonts/IRANSans/woff2/IRANSansWeb(FaNum)_Medium.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/ url('./assets/fonts/IRANSans/woff/IRANSansWeb(FaNum)_Medium.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('./assets/fonts/IRANSans/ttf/IRANSansWeb(FaNum)_Medium.ttf') format('truetype');
+}
+@font-face {
+	font-family: IRANSans;
+	font-style: normal;
+	font-weight: 300;
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_Light.eot');
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_Light.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */ url('./assets/fonts/IRANSans/woff2/IRANSansWeb(FaNum)_Light.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/ url('./assets/fonts/IRANSans/woff/IRANSansWeb(FaNum)_Light.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('./assets/fonts/IRANSans/ttf/IRANSansWeb(FaNum)_Light.ttf') format('truetype');
+}
+@font-face {
+	font-family: IRANSans;
+	font-style: normal;
+	font-weight: 200;
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_UltraLight.eot');
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum)_UltraLight.eot?#iefix') format('embedded-opentype'),  /* IE6-8 */ url('./assets/fonts/IRANSans/woff2/IRANSansWeb(FaNum)_UltraLight.woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/ url('./assets/fonts/IRANSans/woff/IRANSansWeb(FaNum)_UltraLight.woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('./assets/fonts/IRANSans/ttf/IRANSansWeb(FaNum)_UltraLight.ttf') format('truetype');
+}
+@font-face {
+	font-family: IRANSans;
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum).eot');
+	src: url('./assets/fonts/IRANSans/eot/IRANSansWeb(FaNum).eot?#iefix') format('embedded-opentype'),  /* IE6-8 */ url('./assets/fonts/IRANSans/woff2/IRANSansWeb(FaNum).woff2') format('woff2'),  /* FF39+,Chrome36+, Opera24+*/ url('./assets/fonts/IRANSans/woff/IRANSansWeb(FaNum).woff') format('woff'),  /* FF3.6+, IE9, Chrome6+, Saf5.1+*/ url('./assets/fonts/IRANSans/ttf/IRANSansWeb(FaNum).ttf') format('truetype');
+}
+
+:root {
+  --sidebar-dark-bg: #2a3042;
+  --sidebar-menu-item-color: #a6b0cf;
+  --sidebar-dark-menu-sub-item-color: #79829c;
+  --sidebar-dark-menu-item-icon-color: #6a7187;
+  --footer-height: 60px;
+  --footer-bg: #262b3c;
+  --footer-color: #a6b0cf;
+  --topnav-bg: #282e3f;
+  --menu-item-color: #a6b0cf;
+  --menu-item-active-color: #556ee6;
+  --bs-body-bg: #222736;
+  --scroll-color: #505464;
+  --textDanger:#f97f7f; 
+  --primary: #00b3ff;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;  
+  font-family: 'Roboto Slab', serif;
+  font-family: 'IRANSans', sans-serif !important;
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  background-color: var(--bs-body-bg);
+  color: #fff;
+}
+
+body ::-webkit-scrollbar {
+  width: 8px;
+}
+
+body ::-webkit-scrollbar-track {
+  background: var(--sidebar-dark-bg);
+}
+
+body ::-webkit-scrollbar-thumb {
+  background: var(--scroll-color); 
+}
+
+.suspense-loading {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hide-navigator {
+  position: absolute;
+  display: none;
+  
+}
+
+.rs-picker-toggle-wrapper {
+  width: 100%;
+}
+
+.demo-wrapper {
+  background-color: rgba(255,255,255,.2);
+  border-radius:10px;
+}
+.demo-toolbar-custom {
+  background: rgba(37, 161, 249, 0.7);
+  color: black !important;
+  direction: ltr;
+  border: unset;
+  border-radius: 10px 10px 0 0;
+}
+.demo-editor-custom {
+  padding: 10px;
+}
+/* .rdw-image-modal, .rdw-emoji-modal, .rdw-link-modal, .rdw-colorpicker-modal {
+  left: 50%;
+  right: 50%;
+} */
+
+/* ========= RESPONSIVE ========== */
+
+@media only screen and (max-width: 450px) {
+  .rs-nav-item {
+    padding: 6px 8px;
+  }
+}
