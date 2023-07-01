@@ -1,4 +1,4 @@
-import MenuIcon from "@mui/icons-material/Menu";
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import { Box, Grid, IconButton, Stack, Typography } from "@mui/material";
 import { useEffect } from "react";
@@ -58,7 +58,7 @@ const BasePages = () => {
   return (
     <Box
       display="grid"
-      gridTemplateColumns={navSlide ? "300px 1fr" : "60px 1fr"}
+      gridTemplateColumns={navSlide ? "250px 1fr" : "60px 1fr"}
       sx={{
         transition: "grid-template-columns 300ms",
         height: "100vh",
@@ -70,7 +70,7 @@ const BasePages = () => {
             <Stack direction={"row"} alignItems={"center"} justifyContent={"center"} gap={1}  sx={{height:'90px'}}>
               <img src={Logo} style={{ width: "70px", height: "70px" }} alt="قالیشویی ابریشم" />
               <Box>
-                <Stack alignItems={"center"}>
+                <Stack alignItems={"center"} sx={{whiteSpace:'nowrap'}}>
                   <Typography variant="h6">قالیشویی ابریشم</Typography>
                   <Typography>از تاریخ 1994</Typography>
                 </Stack>
@@ -104,7 +104,7 @@ const BasePages = () => {
           }}
         >
           <IconButton onClick={() => dispatch(toggleNav())}>
-            <MenuIcon sx={{ color: "gray.light" }} />
+            <MenuOpenIcon sx={{ color: "gray.light", transform: navSlide ? 'rotate(180deg)': "unset" }} />
           </IconButton>
 
           <IconButton onClick={toggleFullscreen}>
@@ -112,7 +112,7 @@ const BasePages = () => {
           </IconButton>
         </Grid>
 
-        <Grid item xs={12} sx={{ mr: "15px", height: "calc(100vh - 80px)", overflow: "auto" }}>
+        <Grid item xs={12} sx={{ mx: "5px", height: "calc(100vh - 80px)", overflow: "auto" }}>
           <Outlet />
         </Grid>
 

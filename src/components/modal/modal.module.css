@@ -1,0 +1,27 @@
+.modalTemplate {
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 100%;
+  width: 100%;
+  padding: 0 10px;
+}
+
+.modalTemplate .centerBox {
+  max-width: 100%;
+  margin: auto;
+  background-color: white;
+  border-radius: 2px;
+  border: 1px solid #000;
+  border-radius: 7px;
+  position: relative;
+  padding: 10px;
+  background-color: var(--bs-body-bg);
+}
+
+.modalTemplate .closeBtn {
+  position: absolute;
+  top: 0;
+  right: 0;
+}

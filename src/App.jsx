@@ -1,9 +1,14 @@
 import { ThemeProvider, createTheme } from "@mui/material";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+
 import BasePages from "./components/basePages";
-import LoginPage from "./pages/loginPage";
-import Dashboard from "./pages/dashboard";
+
+const Dashboard = lazy(() => import("./pages/dashboard"));
+const LoginPage = lazy(() => import("./pages/loginPage"));
+const Page404 = lazy(() => import("./pages/Page404"));
+const BlogPage = lazy(() => import("./pages/blog"));
+// const SocialMediaPage = lazy(() => import("./pages/socialMedia"));
 
 function App() {
   function suspenseWarper(element) {
@@ -52,6 +57,7 @@ function App() {
       fontFamily: "IRANSans",
     },
     palette: {
+      mode:'dark',
       primary: {
         main: "#00b3ff",
         dark: "#145ea8",
@@ -70,9 +76,10 @@ function App() {
       <Routes>
         <Route path="/" element={<BasePages />}>
           <Route path="/dashboard" element={suspenseWarper(<Dashboard />)} />
+          <Route path="/blogs" element={suspenseWarper(<BlogPage />)} />
           {/* <Route path="/social-media" element={suspenseWarper(<SocialMediaPage />)} />
-          <Route path="/blogs" element={suspenseWarper(<BlogsPage />)} />
-          <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> */}
+        <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> */}
+          <Route path="*" element={suspenseWarper(<Page404 />)} />
         </Route>
         <Route path="/login" element={suspenseWarper(<LoginPage />)} />
       </Routes>

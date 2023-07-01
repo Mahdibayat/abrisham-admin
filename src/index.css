@@ -63,7 +63,7 @@
 
 body {
   background-color: var(--bs-body-bg);
-  color: #fff;
+  color: #dedede;
 }
 
 body ::-webkit-scrollbar {
@@ -76,6 +76,10 @@ body ::-webkit-scrollbar-track {
 
 body ::-webkit-scrollbar-thumb {
   background: var(--scroll-color); 
+}
+
+a {
+  text-decoration: unset;
 }
 
 .suspense-loading {
@@ -115,6 +119,11 @@ body ::-webkit-scrollbar-thumb {
   left: 50%;
   right: 50%;
 } */
+
+.MuiButton-endIcon {
+  margin-right: 4px !important;
+  margin-left: unset !important;
+}
 
 /* ========= RESPONSIVE ========== */
 
