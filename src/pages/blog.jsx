@@ -72,18 +72,20 @@ export default function BlogPage() {
 
     const formData = new FormData();
     formData.append("title", values.title);
+    formData.append("read_time", values.read_time);
     if (editor) formData.append("description", editor);
     if (image) formData.append("images[]", image, image.name);
 
+    let url = editId ? `edit/blog/${editId}` : "add/blog" 
+
     try {
-      const res = await http.post(baseUrl + "add/blog", formData);
-      console.log("RES : ", res);
-      if (!res.status) throw res;
+      const {data} = await http.post(baseUrl + url, formData);
+      if (!data.status) throw data;
       setModal(false);
       setEditId(null);
       fetchList();
       defaultRef.current = "";
-      Notiflix.Notify.success(res.message);
+      Notiflix.Notify.success(data.message);
     } catch (error) {
       console.error({ error });
     } finally {
@@ -95,12 +97,12 @@ export default function BlogPage() {
     if (truest) {
       setSubLoading(true);
       try {
-        const res = await http.get(baseUrl + `delete/blog/${editId}`);
-        if (!res.status) throw res;
+        const {data} = await http.get(baseUrl + `delete/blog/${editId}`);
+        if (!data.status) throw data;
         setDeleteWarningModal(false);
         setEditId(null);
         fetchList();
-        Notiflix.Notify.success(res.message);
+        Notiflix.Notify.success(data.message);
       } catch (error) {
         console.error({ error });
       } finally {
@@ -131,12 +133,11 @@ export default function BlogPage() {
     initialValues: {
       title: "",
       description: "",
+      read_time: ""
     },
     validationSchema: blogValidator,
     onSubmit: handleSubmit,
   });
-
-  console.log({ list });
 
   return (
     <>
@@ -150,22 +151,23 @@ export default function BlogPage() {
       {/* TABLE */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
+          <TableHead sx={{bgcolor:'gray.dark'}}>
             <TableRow>
-              <TableCell align="right">ایجاد شده در</TableCell>
-              <TableCell align="right">عنوان مقاله</TableCell>
-              <TableCell align="right">عملیات</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عنوان مقاله</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">مدت زمان مطالعه</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {list.map((row) => (
               <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                {console.log("ROW : ", row)}
                 <TableCell align="right">
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
                 <TableCell align="right">{row.title}</TableCell>
+                <TableCell align="center">{row.read_time || "-"}</TableCell>
                 <TableCell align="right">
                   <Stack direction={"row"}>
                     <Button
@@ -216,13 +218,12 @@ export default function BlogPage() {
           setModal(false);
           defaultRef.current = "";
         }}
-        size="lg"
-        backdrop="static"
+        size={1000}
       >
         <DialogTitle>{editId ? "ویرایش" : "اضافه کردن"} مقاله</DialogTitle>
 
         <DialogContent>
-          <Grid container>
+          <Grid container spacing={1} columnSpacing={3}>
             <Grid item xs={12} md={6}>
               <Input
                 label={"عنوان مقاله"}
@@ -233,12 +234,28 @@ export default function BlogPage() {
                 error={formik.touched["title"] && Boolean(formik.errors["title"])}
                 helperText={formik.touched["title"] && formik.errors["title"]}
                 required
+                fullWidth
+              />
+
+              <Input
+                label={"مدت زمان خواندن پروژه"}
+                name={"read_time"}
+                value={formik.values["read_time"]}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched["read_time"] && Boolean(formik.errors["read_time"])}
+                helperText={formik.touched["read_time"] && formik.errors["read_time"]}
+                placeholder={'عدد به دقیقه وارد شود'}
+                type='number'
+                required
+                fullWidth
               />
             </Grid>
+
             <Grid item xs={12} md={6}>
               <UploadImage
                 emptyIcon={<CropOriginalIcon style={{ width: "100%", height: "100%" }} />}
-                height="160px"
+                height="180px"
                 width="100%"
                 setUploadedImage={setImage}
               />
@@ -246,9 +263,8 @@ export default function BlogPage() {
 
             <Grid item xs={12} mt={2}>
               <TextEditor
-                label="متن مقاله"
-                setValue={setEditorValue}
-                defaultValue={defaultRef.current}
+                setEditorValue={setEditorValue}
+                defaultValue={defaultRef.current || "<h3 style='text-align:center;'>متن مقاله را وارد کنید</h3>"}
               />
             </Grid>
           </Grid>
@@ -273,7 +289,7 @@ export default function BlogPage() {
             style={{ minWidth: "120px" }}
             disabled={subLoading}
           >
-            ثبت
+            {editId ? "ویرایش": "ثبت"}
           </Button>
         </DialogActions>
       </ModalTemplate>
@@ -288,18 +304,17 @@ export default function BlogPage() {
         size={800}
       >
         <DialogTitle>مدیریت عکس های مقاله</DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{width:1}}>
           {!!editId && (
-            <Grid container spacing={1}>
-              {list
-                .find((b) => b.id === editId)
-                .images.map((img) => (
+            <Grid container sx={{width:1}} spacing={2}>
+              {!!list.find((b) => b.id === editId).images.length ?
+                list.find((b) => b.id === editId).images.map((img) => (
                   <Grid
                     item
                     xs={12}
                     sm={6}
                     key={img.id}
-                    sx={{ height: "120px", position: "relative" }}
+                    sx={{ height: "180px", width:1, position: "relative", border:'5px solid transparent' }}
                   >
                     <img
                       src={baseUrlImage + img.filename}
@@ -311,10 +326,10 @@ export default function BlogPage() {
                         borderRadius: "7px",
                       }}
                     />
-                    <ButtonGroup style={{ position: "absolute", left: "5px", bottom: "2px" }}>
+                    <ButtonGroup style={{ position: "absolute", left: "5px", bottom: "0" }}>
                       <Button
                         color="error"
-                        variant="outlined"
+                        variant="contained"
                         onClick={() => handleRemoveBlogImage(img.id)}
                         disabled={subLoading}
                       >
@@ -322,7 +337,12 @@ export default function BlogPage() {
                       </Button>
                     </ButtonGroup>
                   </Grid>
-                ))}
+                ))
+                :
+                <Grid item sx={{minHeight:'60px', width:1, display:'flex', justifyContent:'center', alignItems:'center'}}>
+                  <h5>برای این مقاله تصویری ثبت نشده است</h5>
+                </Grid>
+              }
             </Grid>
           )}
         </DialogContent>

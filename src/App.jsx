@@ -3,6 +3,10 @@ import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import BasePages from "./components/basePages";
+import SocialMediaPage from "./pages/socialMedia";
+import AboutUsPage from "./pages/aboutUs";
+import ContactUsPage from "./pages/contactUs";
+import ServicesPage from "./pages/services";
 
 const Dashboard = lazy(() => import("./pages/dashboard"));
 const LoginPage = lazy(() => import("./pages/loginPage"));
@@ -65,7 +69,7 @@ function App() {
       },
       gray: {
         main: "#262b3c",
-        dark: "#a6b0cf",
+        dark: "#2d3345",
         light: "#a6b0cf"
       }
     },
@@ -77,8 +81,10 @@ function App() {
         <Route path="/" element={<BasePages />}>
           <Route path="/dashboard" element={suspenseWarper(<Dashboard />)} />
           <Route path="/blogs" element={suspenseWarper(<BlogPage />)} />
-          {/* <Route path="/social-media" element={suspenseWarper(<SocialMediaPage />)} />
-        <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> */}
+          <Route path="/social-media" element={suspenseWarper(<SocialMediaPage />)} />
+          <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> 
+          <Route path="/call-us" element={suspenseWarper(<ContactUsPage />)} /> 
+          <Route path="/services" element={suspenseWarper(<ServicesPage />)} /> 
           <Route path="*" element={suspenseWarper(<Page404 />)} />
         </Route>
         <Route path="/login" element={suspenseWarper(<LoginPage />)} />

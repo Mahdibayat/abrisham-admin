@@ -4,7 +4,6 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./scripts/store.js";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(

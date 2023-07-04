@@ -11,6 +11,8 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import RssFeedIcon from "@mui/icons-material/RssFeed";
 import ShareIcon from "@mui/icons-material/Share";
 import InfoIcon from "@mui/icons-material/Info";
+import PhoneCallbackIcon from '@mui/icons-material/PhoneCallback';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
 const SideBarLinks = ({ open }) => {
   const location = useLocation();
@@ -52,6 +54,22 @@ const SideBarLinks = ({ open }) => {
         isOpen={open}
         to="/about-us"
         isActive={active === "/about-us"}
+      />
+
+      <SideBarLink
+        icon={<PhoneCallbackIcon />}
+        title="تماس با ما"
+        isOpen={open}
+        to="/call-us"
+        isActive={active === "/call-us"}
+      />
+
+      <SideBarLink
+        icon={<CleaningServicesIcon />}
+        title="سرویس ها"
+        isOpen={open}
+        to="/services"
+        isActive={active === "/services"}
       />
     </div>
   );

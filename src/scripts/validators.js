@@ -14,6 +14,16 @@ export const aboutUsValidator = yup.object({
   description: yup.string().min(25, "برای توضیحات مقاله به تعداد کاراکتر بیشتری نیاز است"),
 });
 
+export const contactUsValidator = yup.object({
+  key: yup.string().required("اجباری"),
+  value: yup.string().required("اجباری")
+});
+
 export const blogValidator = yup.object({
   title: yup.string().required("اجباری"),
+});
+
+export const serviceValidator = yup.object({
+  title: yup.string().required("اجباری"),
+  status: yup.bool().required("اجباری")
 });
