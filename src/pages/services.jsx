@@ -13,6 +13,7 @@ import Input from "../components/Input/Input";
 import CustomSwitch from "../components/customSwitch";
 import UploadImage from "../components/uploadImage/uploadImage";
 import WallpaperIcon from '@mui/icons-material/Wallpaper';
+import { useNavigate } from "react-router-dom";
 
 
 export default function ServicesPage() {
@@ -21,8 +22,10 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
   const [list, setList] = useState([]);
-  const [status, setStatus] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [deleteWarningModal, setDeleteWarningModal] = useState(false);
+  const [attrModal, setAttrModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch();
@@ -73,8 +76,25 @@ export default function ServicesPage() {
     }
   }
 
-  console.log(formik.values);
-  console.log(formik.errors);
+  async function handleRemove(truest) {
+    if (truest) {
+      setSubLoading(true);
+      try {
+        const {data} = await http.get(baseUrl + `delete/service/${editId}`);
+        if (!data.status) throw data;
+        setDeleteWarningModal(false);
+        setEditId(null);
+        fetch();
+        Notiflix.Notify.success(data.message);
+      } catch (error) {
+        console.error({ error });
+      } finally {
+        setSubLoading(false);
+      }
+    } else {
+      setDeleteWarningModal(true);
+    }
+  }
 
   return (
     <>
@@ -101,7 +121,7 @@ export default function ServicesPage() {
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
                 <TableCell align="right">{row.title}</TableCell>
-                <TableCell align="right">{row.status}</TableCell>
+                <TableCell align="right">{row.status === 'active' ? "فعال" : "غیر فعال"}</TableCell>
                 <TableCell align="right">
                     <img src={baseUrlImage + row.icon} alt={row.title} style={{width:'200px', height:'120px', objectFit:'cover'}} />
                 </TableCell>
@@ -123,10 +143,22 @@ export default function ServicesPage() {
                     color="error"
                     onClick={() => {
                       setEditId(row.id);
-                      // handleRemoveBlog(false);
+                      handleRemove(false);
                     }}
                   >
                     حذف
+                  </Button>
+                  
+                  <Button
+                    variant="text"
+                    color="secondary"
+                    onClick={() => {
+                      setEditId(row.id);
+                      setAttrModal(true);
+                      navigate("./attr", {state : {id: row.id}})
+                    }}
+                  >
+                    زیرشاخه ها
                   </Button>
                 </TableCell>
               </TableRow>
@@ -160,29 +192,93 @@ export default function ServicesPage() {
                 fullWidth
               />
 
-              <Stack direction={'row'} gap={1} alignItems={'center'}>
+              <Stack direction={'row'} gap={1} alignItems={'center'} mt={5}>
                 <Typography>وضعیت سرویس : </Typography>
-                <CustomSwitch falseText="غیر فعال" size="lg" trueText="فعال" value={status} setValue={setStatus} />
+                <CustomSwitch falseText="غیر فعال" size="lg" trueText="فعال" value={formik.values.status} setValue={(e) => formik.setFieldValue('status', e)} />
               </Stack>
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <UploadImage width={'100%'} height={'180px'} emptyIcon={<WallpaperIcon />} setUploadedImage={setUploadedImage}  />
+              <UploadImage width={'100%'} height={'230px'} emptyIcon={<WallpaperIcon />} setUploadedImage={setUploadedImage}  />
             </Grid>
           </Grid>
-
         </DialogContent>
 
         <DialogActions sx={{gap:1}}>
           <Button variant="outlined" disabled={subLoading} onClick={()=>{
-          setModal(false);
-          setEditId(false)
+            setModal(false);
+            setEditId(false)
           }}>انصراف</Button>
           <Button variant="contained" disabled={subLoading} onClick={formik.handleSubmit} >{editId ? "ویرایش" : "ثبت"}</Button>
         </DialogActions>
 
       </ModalTemplate>
+      
+      {/* DELETE WARNING MODAL */}
+      <ModalTemplate
+        open={deleteWarningModal}
+        onClose={() => {
+          setEditId(null);
+          setDeleteWarningModal(false);
+        }}
+        size={320}
+      >
+        <DialogTitle>هشدار</DialogTitle>
 
+        <DialogContent>
+          <span>آیا از حذف این مقاله مطمئن هستید؟</span>
+        </DialogContent>
+
+        <DialogActions sx={{ gap: 1 }}>
+          <Button
+            onClick={() => {
+              setEditId(null);
+              setDeleteWarningModal(false);
+            }}
+            disabled={subLoading}
+          >
+            انصراف
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            style={{ minWidth: "120px" }}
+            disabled={subLoading}
+            onClick={() => handleRemove(true)}
+          >
+            حذف
+          </Button>
+        </DialogActions>
+      </ModalTemplate>
+
+      {/* ATTR MODAL */}
+      <ModalTemplate
+        open={attrModal}
+        onClose={()=>{
+          setEditId(null)
+          setAttrModal(false)
+        }}
+        size={1000}
+      >
+        <DialogTitle>مدیریت زیرشاخه های سرویس</DialogTitle>
+
+        <DialogContent>
+
+        </DialogContent>
+
+        <DialogActions>
+          <Button 
+            onClick={()=>{
+              setEditId(null)
+              setAttrModal(false)
+            }}
+            variant='outlined'
+          >انصراف</Button>
+
+          <Button variant='contained'>ثبت</Button>
+        </DialogActions>
+
+      </ModalTemplate>
     </>
   )
 }

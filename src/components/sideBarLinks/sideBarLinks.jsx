@@ -13,6 +13,8 @@ import ShareIcon from "@mui/icons-material/Share";
 import InfoIcon from "@mui/icons-material/Info";
 import PhoneCallbackIcon from '@mui/icons-material/PhoneCallback';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import QuizIcon from '@mui/icons-material/Quiz';
 
 const SideBarLinks = ({ open }) => {
   const location = useLocation();
@@ -70,6 +72,22 @@ const SideBarLinks = ({ open }) => {
         isOpen={open}
         to="/services"
         isActive={active === "/services"}
+      />
+
+      <SideBarLink
+        icon={<QuestionAnswerIcon />}
+        title="نظرات"
+        isOpen={open}
+        to="/comment"
+        isActive={active === "/comment"}
+      />
+
+      <SideBarLink
+        icon={<QuizIcon  />}
+        title="سوالات متداول"
+        isOpen={open}
+        to="/faq"
+        isActive={active === "/faq"}
       />
     </div>
   );

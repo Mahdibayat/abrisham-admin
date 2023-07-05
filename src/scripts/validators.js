@@ -27,3 +27,14 @@ export const serviceValidator = yup.object({
   title: yup.string().required("اجباری"),
   status: yup.bool().required("اجباری")
 });
+
+export const serviceAttrValidator = yup.object({
+  title: yup.string().required("اجباری"),
+});
+
+export const faqValidator = yup.object({
+  question: yup.string().required("اجباری"),
+  answer: yup.string().required("اجباری"),
+  priority: yup.number().required("اجباری")
+});
+

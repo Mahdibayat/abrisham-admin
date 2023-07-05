@@ -3,15 +3,18 @@ import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import BasePages from "./components/basePages";
-import SocialMediaPage from "./pages/socialMedia";
-import AboutUsPage from "./pages/aboutUs";
-import ContactUsPage from "./pages/contactUs";
-import ServicesPage from "./pages/services";
 
 const Dashboard = lazy(() => import("./pages/dashboard"));
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const Page404 = lazy(() => import("./pages/Page404"));
 const BlogPage = lazy(() => import("./pages/blog"));
+const ServicesPage = lazy(() => import("./pages/services"));
+const ServicesAttrPage = lazy(() => import("./pages/serviceAttr"));
+const AboutUsPage = lazy(() => import("./pages/aboutUs"));
+const SocialMediaPage = lazy(() => import("./pages/socialMedia"));
+const ContactUsPage = lazy(() => import("./pages/contactUs"));
+const CommentPage = lazy(() => import("./pages/comment"));
+const FaqPage = lazy(() => import("./pages/faqPage"));
 // const SocialMediaPage = lazy(() => import("./pages/socialMedia"));
 
 function App() {
@@ -84,7 +87,10 @@ function App() {
           <Route path="/social-media" element={suspenseWarper(<SocialMediaPage />)} />
           <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> 
           <Route path="/call-us" element={suspenseWarper(<ContactUsPage />)} /> 
-          <Route path="/services" element={suspenseWarper(<ServicesPage />)} /> 
+          <Route path="/services" element={suspenseWarper(<ServicesPage />)} />
+          <Route path="/services/attr" element={suspenseWarper(<ServicesAttrPage />)} /> 
+          <Route path="/comment" element={suspenseWarper(<CommentPage />)} /> 
+          <Route path="/faq" element={suspenseWarper(<FaqPage />)} /> 
           <Route path="*" element={suspenseWarper(<Page404 />)} />
         </Route>
         <Route path="/login" element={suspenseWarper(<LoginPage />)} />

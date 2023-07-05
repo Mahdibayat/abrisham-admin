@@ -5,7 +5,7 @@ import {Box, Typography} from "@mui/material";
 function CustomSwitch({
   size="md",
   value=false,
-  setValue=() => null,
+  setValue,
   trueText="trueText",
   falseText="falseText",
 }) {
@@ -21,14 +21,14 @@ function CustomSwitch({
         bgcolor: "rgba(150,150,150,0.4)",
         position: "relative",
         overflow: "hidden",
-        boxShadow: "inset 0 0 3px 5px #d9d7d7",
+        boxShadow: "inset 0 0 3px 5px #81818133",
       }}
       onClick={() => setValue(!value)}
     >
       <Typography
         style={{
           fontSize: size === "sm" ? "10px" : size === "md" ? "12px" : "13px",
-          color: "dimgray",
+          color: "silver",
         }}
       >
         {falseText}
@@ -36,7 +36,7 @@ function CustomSwitch({
       <Typography
         style={{
           fontSize: size === "sm" ? "10px" : size === "md" ? "12px" : "13px",
-          color: "dimgray",
+          color: "silver",
         }}
       >
         {trueText}

@@ -41,6 +41,7 @@ const ModalTemplate=({
       open={open}
       onClose={typeof force === "undefined" || !force ? onClose : undefined}
       closeAfterTransition={false}
+      sx={{"& *": {outline:'none'}}}
     >
       <Box className={styles.modalTemplate}>
         <Box
