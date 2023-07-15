@@ -15,6 +15,7 @@ import PhoneCallbackIcon from '@mui/icons-material/PhoneCallback';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import QuizIcon from '@mui/icons-material/Quiz';
+import ImagesearchRollerIcon from '@mui/icons-material/ImagesearchRoller';
 
 const SideBarLinks = ({ open }) => {
   const location = useLocation();
@@ -32,6 +33,14 @@ const SideBarLinks = ({ open }) => {
         isOpen={open}
         to="/dashboard"
         isActive={active === "/dashboard"}
+      />
+
+      <SideBarLink
+        icon={<ImagesearchRollerIcon />}
+        title="تصاویر صفحه اصلی"
+        isOpen={open}
+        to="/home-slider"
+        isActive={active === "/home-slider"}
       />
 
       <SideBarLink

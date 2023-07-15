@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import BasePages from "./components/basePages";
 
 const Dashboard = lazy(() => import("./pages/dashboard"));
+const HomeSliderPage = lazy(() => import("./pages/homeSlider"));
 const LoginPage = lazy(() => import("./pages/loginPage"));
 const Page404 = lazy(() => import("./pages/Page404"));
 const BlogPage = lazy(() => import("./pages/blog"));
@@ -83,6 +84,7 @@ function App() {
       <Routes>
         <Route path="/" element={<BasePages />}>
           <Route path="/dashboard" element={suspenseWarper(<Dashboard />)} />
+          <Route path="/home-slider" element={suspenseWarper(<HomeSliderPage />)} />
           <Route path="/blogs" element={suspenseWarper(<BlogPage />)} />
           <Route path="/social-media" element={suspenseWarper(<SocialMediaPage />)} />
           <Route path="/about-us" element={suspenseWarper(<AboutUsPage />)} /> 

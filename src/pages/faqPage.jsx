@@ -27,7 +27,7 @@ export default function FaqPage() {
   async function fetch() {
     setLoading(true);
     try {
-      const {data} = await http.get(baseUrl + "list/fqa");
+      const {data} = await http.get(baseUrl + "list/Fqa");
       setList(data.data)
     } catch (error) {
       console.error({error});
@@ -62,6 +62,7 @@ export default function FaqPage() {
       Notiflix.Notify.success(data.message);
       setModal(false);
       setEditId(null);
+      formik.resetForm();
       fetch();
     } catch (error) {
       console.error({error});
@@ -78,6 +79,7 @@ export default function FaqPage() {
         if (!data.status) throw data;
         setDeleteWarningModal(false);
         setEditId(null);
+        formik.resetForm();
         fetch();
         Notiflix.Notify.success(data.message);
       } catch (error) {
@@ -102,8 +104,9 @@ export default function FaqPage() {
           <TableHead sx={{bgcolor:'gray.dark'}}>
             <TableRow>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عنوان</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">مقدار</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">اولویت</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">سوال</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">جواب</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
             </TableRow>
           </TableHead>
@@ -114,15 +117,17 @@ export default function FaqPage() {
                 <TableCell align="right">
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
-                <TableCell align="right">{row.key}</TableCell>
-                <TableCell align="right">{row.value}</TableCell>
+                <TableCell align="right">{row.priority}</TableCell>
+                <TableCell align="right">{row.question}</TableCell>
+                <TableCell align="right">{row.answer}</TableCell>
                 <TableCell align="right">
                   <Button
                     variant="text"
                     onClick={() => {
                       setEditId(row.id);
-                      formik.setFieldValue('key', row.key)
-                      formik.setFieldValue('value', row.value)
+                      formik.setFieldValue('priority', row.priority)
+                      formik.setFieldValue('question', row.question)
+                      formik.setFieldValue('answer', row.answer)
                       setModal(true);
                     }}
                   >
@@ -150,6 +155,7 @@ export default function FaqPage() {
       <ModalTemplate open={modal} size={600} onClose={()=>{
         setModal(false);
         setEditId(null);
+        formik.resetForm();
       }}
       >
         <DialogTitle>{editId ? "ویرایش" : "ایجاد"} سوال متداول</DialogTitle>
@@ -206,6 +212,7 @@ export default function FaqPage() {
           <Button onClick={()=>{
             setModal(false);
             setEditId(null);
+            formik.resetForm();
           }} variant="outlined" disabled={subLoading} >انصراف</Button>
           <Button disabled={subLoading} onClick={formik.handleSubmit} variant="contained" sx={{minWidth:'120px'}} >{editId ? "ویرایش" : "ثبت"}</Button>
         </DialogActions>
@@ -217,6 +224,7 @@ export default function FaqPage() {
         open={deleteWarningModal}
         onClose={() => {
           setEditId(null);
+          formik.resetForm();
           setDeleteWarningModal(false);
         }}
         size={320}

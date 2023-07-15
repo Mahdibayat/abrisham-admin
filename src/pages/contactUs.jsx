@@ -1,232 +1,262 @@
-import { Button, DialogActions, DialogContent, DialogTitle, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import PageTitle from "../components/pageTitle";
-import AddIcon from '@mui/icons-material/Add';
-import moment from "moment-jalaali";
-import { useEffect, useState } from "react";
-import { baseUrl, http } from "../scripts/axiosMethods";
-import Loader from "../components/loader/loader";
-import ModalTemplate from "../components/modal/modalTemplate";
-import Input from "../components/Input/Input";
+import { Box, Button, Grid, Paper, Stack } from "@mui/material";
 import { useFormik } from "formik";
-import { contactUsValidator } from "../scripts/validators";
 import Notiflix from "notiflix";
+import { useEffect, useState } from "react";
+import Input from "../components/Input/Input";
+import PageTitle from "../components/pageTitle";
+import { baseUrl, http } from "../scripts/axiosMethods";
+import { contactUsValidator } from "../scripts/validators";
 
 export default function ContactUsPage() {
-  const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editId, setEditId] = useState(null);
-  const [modal, setModal] = useState(false);
-  const [subLoading, setSubLoading] = useState(false);
-  const [deleteWarningModal, setDeleteWarningModal] = useState(false);
 
   useEffect(() => {
-    fetch()
+    fetch();
   }, []);
 
   async function fetch() {
     setLoading(true);
     try {
-      const {data} = await http.get(baseUrl + "list/contactUS");
-      console.log("DATA : ", data)
-      setList(data.data)
+      const { data } = await http.get(baseUrl + "list/contactUS");
+      const keys = Object.keys(data.data[0]);
+      keys.forEach((x) => {
+        if (x === "created_at" || x === "updated_at") return;
+        console.log({ x });
+        formik.setFieldValue(x, data.data[0][x]);
+      });
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
       setLoading(false);
     }
   }
-  
+
   const formik = useFormik({
     initialValues: {
-      key: "",
-      value: ""
+      id: 1,
+      phone1: "",
+      phone2: "",
+      phone3: "",
+      phone4: "",
+      phone5: "",
+      lat: "",
+      long: "",
+      address: "",
     },
     validationSchema: contactUsValidator,
-    onSubmit: handleSubmit
+    onSubmit: handleSubmit,
   });
-  
+
   async function handleSubmit(values) {
-    setSubLoading(true);
+    setLoading(true);
 
     const formData = new FormData();
-    formData.append( "key" , values.key );
-    formData.append( "value" , values.value );
-
-    const url = editId ? `edit/contactUS/${editId}` : "add/contactUS";
+    const keys = Object.keys(values);
+    keys.forEach(key => {
+      if (key === 'id') return
+      formData.append(key , values[key]);
+    })
 
     try {
-      const { data } = await http.post(baseUrl + url, formData)
+      const { data } = await http.post(baseUrl + `edit/contactUS/${values.id}`, formData);
       if (!data.status) throw data;
       Notiflix.Notify.success(data.message);
-      setModal(false);
-      setEditId(null);
       fetch();
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
-      setSubLoading(false);
-    }
-  }
-  
-  async function handleRemoveBlog(truest) {
-    if (truest) {
-      setSubLoading(true);
-      try {
-        const {data} = await http.get(baseUrl + `delete/contactUS/${editId}`);
-        if (!data.status) throw data;
-        setDeleteWarningModal(false);
-        setEditId(null);
-        fetch();
-        Notiflix.Notify.success(data.message);
-      } catch (error) {
-        console.error({ error });
-      } finally {
-        setSubLoading(false);
-      }
-    } else {
-      setDeleteWarningModal(true);
+      setLoading(false);
     }
   }
 
   return (
-    <>
-      <PageTitle title="مدیریت تماس با ما">
-        <Button variant={'contained'} endIcon={<AddIcon />} onClick={() => setModal(true)}>ایجاد</Button>
-      </PageTitle>
+    <Box sx={{ width: 1 }}>
+      <PageTitle title="مدیریت تماس با ما"  />
 
-      
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead sx={{bgcolor:'gray.dark'}}>
-            <TableRow>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عنوان</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">مقدار</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {list.map((row) => (
-              <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell align="right">
-                  {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
-                </TableCell>
-                <TableCell align="right">{row.key}</TableCell>
-                <TableCell align="right">{row.value}</TableCell>
-                <TableCell align="right">
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      setEditId(row.id);
-                      formik.setFieldValue('key', row.key)
-                      formik.setFieldValue('value', row.value)
-                      setModal(true);
-                    }}
-                  >
-                    ویرایش
-                  </Button>
-
-                  <Button
-                    variant="text"
-                    color="error"
-                    onClick={() => {
-                      setEditId(row.id);
-                      handleRemoveBlog(false);
-                    }}
-                  >
-                    حذف
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {loading && <Loader />}
-      </TableContainer>
-
-      <ModalTemplate open={modal} size={600} onClose={()=>{
-        setModal(false);
-        setEditId(null);
-      }}
-      >
-        <DialogTitle>{editId ? "ویرایش" : "ایجاد"} فیلد جدید تماس با ما</DialogTitle>
-
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
-              <Input
-                label={"عنوان"}
-                name={"key"}
-                value={formik.values["key"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["key"] && Boolean(formik.errors["key"])}
-                helperText={formik.touched["key"] && formik.errors["key"]}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Input
-                label={"مقدار"}
-                name={"value"}
-                value={formik.values["value"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["value"] && Boolean(formik.errors["value"])}
-                helperText={formik.touched["value"] && formik.errors["value"]}
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions sx={{gap:1}}>
-          <Button onClick={()=>{
-            setModal(false);
-            setEditId(null);
-          }} variant="outlined" disabled={subLoading} >انصراف</Button>
-          <Button disabled={subLoading} onClick={formik.handleSubmit} variant="contained" sx={{minWidth:'120px'}} >{editId ? "ویرایش" : "ثبت"}</Button>
-        </DialogActions>
-      </ModalTemplate>
-
-      
-      {/* DELETE WARNING MODAL */}
-      <ModalTemplate
-        open={deleteWarningModal}
-        onClose={() => {
-          setEditId(null);
-          setDeleteWarningModal(false);
+      <Grid
+        container
+        sx={{
+          width: 1,
+          p: { xs: 1, md: 5 },
         }}
-        size={320}
+        component={Paper}
+        columnSpacing={3}
       >
-        <DialogTitle>هشدار</DialogTitle>
-        <DialogContent>
-          <span>آیا از حذف این مقاله مطمئن هستید؟</span>
-        </DialogContent>
-        <DialogActions sx={{ gap: 1 }}>
-          <Button
-            onClick={() => {
-              setEditId(null);
-              setDeleteWarningModal(false);
-            }}
-            disabled={subLoading}
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 1"}
+            name={"phone1"}
+            value={formik.values["phone1"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone1"] && Boolean(formik.errors["phone1"])}
+            helperText={formik.touched["phone1"] && formik.errors["phone1"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 2"}
+            name={"phone2"}
+            value={formik.values["phone2"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone2"] && Boolean(formik.errors["phone2"])}
+            helperText={formik.touched["phone2"] && formik.errors["phone2"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 3"}
+            name={"phone3"}
+            value={formik.values["phone3"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone3"] && Boolean(formik.errors["phone3"])}
+            helperText={formik.touched["phone3"] && formik.errors["phone3"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 4"}
+            name={"phone4"}
+            value={formik.values["phone4"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone4"] && Boolean(formik.errors["phone4"])}
+            helperText={formik.touched["phone4"] && formik.errors["phone4"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 5"}
+            name={"phone5"}
+            value={formik.values["phone5"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone5"] && Boolean(formik.errors["phone5"])}
+            helperText={formik.touched["phone5"] && formik.errors["phone5"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"آدرس"}
+            name={"address"}
+            value={formik.values["address"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched["address"] && Boolean(formik.errors["address"])
+            }
+            helperText={formik.touched["address"] && formik.errors["address"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"طول جغرافیایی"}
+            name={"lat"}
+            value={formik.values["lat"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["lat"] && Boolean(formik.errors["lat"])}
+            helperText={formik.touched["lat"] && formik.errors["lat"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"عرض جغرافیایی"}
+            name={"long"}
+            value={formik.values["long"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["long"] && Boolean(formik.errors["long"])}
+            helperText={formik.touched["long"] && formik.errors["long"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        {/* ACTION AREA */}
+        <Grid
+          item
+          xs={12}
+        >
+          <Stack
+            direction={"row"}
+            justifyContent={"flex-end"}
           >
-            انصراف
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            style={{ minWidth: "120px" }}
-            disabled={subLoading}
-            onClick={() => handleRemoveBlog(true)}
-          >
-            حذف
-          </Button>
-        </DialogActions>
-      </ModalTemplate>
-    </>
-  )
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ minWidth: "220px", mt: 2 }}
+              disabled={loading}
+              onClick={formik.handleSubmit}
+            >
+              ثبت اطلاعات جدید
+            </Button>
+          </Stack>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }

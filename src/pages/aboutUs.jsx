@@ -11,6 +11,7 @@ import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import TextEditor from "../components/textEditor/textEditor";
 import ModalTemplate from "../components/modal/modalTemplate";
 import Loader from "../components/loader/loader";
+import Input from "../components/Input/Input";
 
 
 function AboutUsPage() {
@@ -43,6 +44,7 @@ function AboutUsPage() {
   const formik = useFormik({
     initialValues: {
       description: "",
+      short_description: "",
     },
     validationSchema: aboutUsValidator,
     onSubmit: handleSubmit,
@@ -53,6 +55,7 @@ function AboutUsPage() {
     const formData = new FormData();
 
     formData.append("description", !!editorValue ? editorValue : !!defaultRef.current ? defaultRef.current : "");
+    formData.append("short_description", formik.values.short_description);
 
     if (!!file) formData.append("image", file, file.name || "x");
 
@@ -82,6 +85,7 @@ function AboutUsPage() {
             <TableRow>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">تصویر</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">توضیحات کوتاه</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">توضیحات</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
             </TableRow>
@@ -100,6 +104,7 @@ function AboutUsPage() {
                     alt=""
                   />
                 </TableCell>
+                <TableCell align="center">{row.short_description}</TableCell>
                 <TableCell align="center">{row.description}</TableCell>
                 <TableCell align="right">
                   <Button
@@ -138,6 +143,20 @@ function AboutUsPage() {
                 width="100%"
                 height="260px"
                 emptyIcon={<WallpaperIcon style={{ width: "100%", height: "100%" }} />}
+              />
+            </Grid>
+
+            <Grid item xs={12} sx={{mt: 3}}>
+              <Input
+                label={'توضیح کوتاه'}
+                name={'short_description'}
+                value={formik.values['short_description']}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched['short_description'] && Boolean(formik.errors['short_description'])}
+                helperText={formik.touched['short_description'] && formik.errors['short_description']}
+                required
+                fullWidth
               />
             </Grid>
 

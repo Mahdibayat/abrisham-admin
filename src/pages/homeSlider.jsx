@@ -1,78 +1,84 @@
+import AddIcon from '@mui/icons-material/Add';
+import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import { Button, DialogActions, DialogContent, DialogTitle, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import PageTitle from "../components/pageTitle";
+import { useFormik } from "formik";
 import moment from "moment-jalaali";
+import Notiflix from "notiflix";
 import { useEffect, useState } from "react";
-import { baseUrl, http } from "../scripts/axiosMethods";
+import Input from "../components/Input/Input";
 import Loader from "../components/loader/loader";
 import ModalTemplate from "../components/modal/modalTemplate";
-import Input from "../components/Input/Input";
-import { useFormik } from "formik";
-import { contactUsValidator } from "../scripts/validators";
-import AddIcon from '@mui/icons-material/Add';
-import Notiflix from "notiflix";
+import PageTitle from "../components/pageTitle";
+import UploadImage from "../components/uploadImage/uploadImage";
+import { baseUrl, baseUrlImage, http } from "../scripts/axiosMethods";
+import { homeSliderValidator } from "../scripts/validators";
 
-export default function CommentPage() {
-  const [list, setList] = useState([]);
+
+function HomeSliderPage() {
   const [loading, setLoading] = useState(true);
-  const [editId, setEditId] = useState(null);
+  const [list, setList] = useState([]);
+  const [images, setImages] = useState([]);
   const [modal, setModal] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [subLoading, setSubLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const [deleteWarningModal, setDeleteWarningModal] = useState(false);
 
   useEffect(() => {
-    fetch()
+    fetch();
   }, []);
 
   async function fetch() {
     setLoading(true);
     try {
-      const {data} = await http.get(baseUrl + "list/comment");
-      setList(data.data)
+      const {data} = await http.get(baseUrl + "list/slider");
+      console.log("DATA : ", data);
+      setList(data.slider);
+      setImages(data.image)
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
       setLoading(false);
     }
   }
-  
+
   const formik = useFormik({
     initialValues: {
-      key: "",
-      value: ""
+      title: "",
+      description: "",
     },
-    validationSchema: contactUsValidator,
-    onSubmit: handleSubmit
+    validationSchema: homeSliderValidator,
+    onSubmit: handleSubmit,
   });
-  
+
   async function handleSubmit(values) {
+    if(!file)
     setSubLoading(true);
-
     const formData = new FormData();
-    formData.append( "key" , values.key );
-    formData.append( "value" , values.value );
 
-    const url = editId ? `edit/comment/${editId}` : "add/contactUS";
+    formData.append("title", values.title);
+    formData.append("description", values.description);
+    if (!!file) formData.append("image", file, file.name || "x");
 
     try {
-      const { data } = await http.post(baseUrl + url, formData)
-      if (!data.status) throw data;
-      Notiflix.Notify.success(data.message);
+      const {data} = await http.post(baseUrl + `add/slider`, formData);
       setModal(false);
-      setEditId(null);
       formik.resetForm();
       fetch();
+      setFile(null)
+      Notiflix.Notify.success(data.message);
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
       setSubLoading(false);
     }
   }
-  
-  async function handleRemoveBlog(truest) {
+
+  async function handleRemove(truest) {
     if (truest) {
       setSubLoading(true);
       try {
-        const {data} = await http.get(baseUrl + `delete/contactUS/${editId}`);
+        const {data} = await http.get(baseUrl + `delete/slider/${editId}`);
         if (!data.status) throw data;
         setDeleteWarningModal(false);
         setEditId(null);
@@ -91,18 +97,19 @@ export default function CommentPage() {
 
   return (
     <>
-      <PageTitle title="مدیریت تماس با ما">
+      <PageTitle title="درباره ما">
         <Button variant={'contained'} endIcon={<AddIcon />} onClick={() => setModal(true)}>ایجاد</Button>
       </PageTitle>
 
-      
+      {/* TABLE */}
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead sx={{bgcolor:'gray.dark'}}>
             <TableRow>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">تصویر</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عنوان</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">مقدار</TableCell>
+              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">توضیحات</TableCell>
               <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
             </TableRow>
           </TableHead>
@@ -113,27 +120,25 @@ export default function CommentPage() {
                 <TableCell align="right">
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
-                <TableCell align="right">{row.key}</TableCell>
-                <TableCell align="right">{row.value}</TableCell>
                 <TableCell align="right">
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      setEditId(row.id);
-                      formik.setFieldValue('key', row.key)
-                      formik.setFieldValue('value', row.value)
-                      setModal(true);
-                    }}
-                  >
-                    ویرایش
-                  </Button>
-
+                  {
+                    typeof images.find(img => img.model_id == row.id) !== 'undefined' && 
+                      <img
+                        src={baseUrlImage + images.find(img => img.model_id == row.id).filename}
+                        style={{ width: "250px", height: "190px", objectFit: "cover" }}
+                        alt=""
+                      />
+                  }
+                </TableCell>
+                <TableCell align="center">{row.title}</TableCell>
+                <TableCell align="center">{row.description}</TableCell>
+                <TableCell align="right">
                   <Button
                     variant="text"
                     color="error"
                     onClick={() => {
                       setEditId(row.id);
-                      handleRemoveBlog(false);
+                      handleRemove(false);
                     }}
                   >
                     حذف
@@ -146,39 +151,51 @@ export default function CommentPage() {
         {loading && <Loader />}
       </TableContainer>
 
-      <ModalTemplate open={modal} size={600} onClose={()=>{
-        setModal(false);
-        setEditId(null);
-        formik.resetForm();
-      }}
+      <ModalTemplate
+        open={modal}
+        onClose={() => {
+          setModal(false);
+          formik.resetForm();
+          setFile(null);
+        }}
+        size={500}
       >
-        <DialogTitle>{editId ? "ویرایش" : "ایجاد"} فیلد جدید تماس با ما</DialogTitle>
-
         <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
+          <Grid container>
+            <Grid item xs={12}>
+              <UploadImage
+                setUploadedImage={setFile}
+                width="100%"
+                height="260px"
+                emptyIcon={<WallpaperIcon style={{ width: "100%", height: "100%" }} />}
+              />
+            </Grid>
+
+            <Grid xs={12} mt={2}>
               <Input
-                label={"عنوان"}
-                name={"key"}
-                value={formik.values["key"]}
+                label={'عنوان'}
+                name={'title'}
+                value={formik.values['title']}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched["key"] && Boolean(formik.errors["key"])}
-                helperText={formik.touched["key"] && formik.errors["key"]}
+                error={formik.touched['title'] && Boolean(formik.errors['title'])}
+                helperText={formik.touched['title'] && formik.errors['title']}
                 required
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+
+            <Grid xs={12} mt={2}>
               <Input
-                label={"مقدار"}
-                name={"value"}
-                value={formik.values["value"]}
+                label={'مطلب'}
+                name={'description'}
+                value={formik.values['description']}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                error={formik.touched["value"] && Boolean(formik.errors["value"])}
-                helperText={formik.touched["value"] && formik.errors["value"]}
-                required
+                error={formik.touched['description'] && Boolean(formik.errors['description'])}
+                helperText={formik.touched['description'] && formik.errors['description']}
+                multiline
+                rows={3}
                 fullWidth
               />
             </Grid>
@@ -186,18 +203,30 @@ export default function CommentPage() {
         </DialogContent>
 
         <DialogActions sx={{gap:1}}>
-          <Button onClick={()=>{
-            setModal(false);
-            setEditId(null);
-            formik.resetForm();
-          }} variant="outlined" disabled={subLoading} >انصراف</Button>
-          <Button disabled={subLoading} onClick={formik.handleSubmit} variant="contained" sx={{minWidth:'120px'}} >{editId ? "ویرایش" : "ثبت"}</Button>
+            <Button
+              onClick={() => {
+                formik.resetForm();
+                setFile(null);
+                setModal(false);
+              }}
+              disabled={subLoading}
+              variant="outlined"
+            >
+              انصراف
+            </Button>
+            <Button
+              disabled={subLoading}
+              onClick={() => formik.handleSubmit()}
+              style={{ minWidth: "120px" }}
+              variant="contained"
+            >
+              ثبت
+            </Button>
         </DialogActions>
       </ModalTemplate>
 
-      
-      {/* DELETE WARNING MODAL */}
-      <ModalTemplate
+            {/* DELETE WARNING MODAL */}
+            <ModalTemplate
         open={deleteWarningModal}
         onClose={() => {
           setEditId(null);
@@ -214,7 +243,6 @@ export default function CommentPage() {
           <Button
             onClick={() => {
               setEditId(null);
-              formik.resetForm();
               setDeleteWarningModal(false);
             }}
             disabled={subLoading}
@@ -226,12 +254,14 @@ export default function CommentPage() {
             color="error"
             style={{ minWidth: "120px" }}
             disabled={subLoading}
-            onClick={() => handleRemoveBlog(true)}
+            onClick={() => handleRemove(true)}
           >
             حذف
           </Button>
         </DialogActions>
       </ModalTemplate>
     </>
-  )
+  );
 }
+
+export default HomeSliderPage;
