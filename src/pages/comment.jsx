@@ -1,143 +1,161 @@
-import { Button, DialogActions, DialogContent, DialogTitle, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
-import PageTitle from "../components/pageTitle";
+import {
+  MenuItem,
+  Paper,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow
+} from "@mui/material";
 import moment from "moment-jalaali";
-import { useEffect, useState } from "react";
-import { baseUrl, http } from "../scripts/axiosMethods";
-import Loader from "../components/loader/loader";
-import ModalTemplate from "../components/modal/modalTemplate";
-import Input from "../components/Input/Input";
-import { useFormik } from "formik";
-import { contactUsValidator } from "../scripts/validators";
-import AddIcon from '@mui/icons-material/Add';
 import Notiflix from "notiflix";
+import { useEffect, useState } from "react";
+import Loader from "../components/loader/loader";
+import PageTitle from "../components/pageTitle";
+import { baseUrl, http } from "../scripts/axiosMethods";
 
 export default function CommentPage() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editId, setEditId] = useState(null);
-  const [modal, setModal] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
-  const [deleteWarningModal, setDeleteWarningModal] = useState(false);
 
   useEffect(() => {
-    fetch()
+    fetch();
   }, []);
 
   async function fetch() {
     setLoading(true);
     try {
-      const {data} = await http.get(baseUrl + "list/comment");
-      setList(data.data)
+      const { data } = await http.get(baseUrl + "list/comment");
+      console.log({ data });
+      setList(data.data);
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
       setLoading(false);
     }
   }
-  
-  const formik = useFormik({
-    initialValues: {
-      key: "",
-      value: ""
-    },
-    validationSchema: contactUsValidator,
-    onSubmit: handleSubmit
-  });
-  
-  async function handleSubmit(values) {
+
+
+  async function handleChangeStatus(e, id) {
+    console.log({ status: e.target.value, id });
+
     setSubLoading(true);
-
-    const formData = new FormData();
-    formData.append( "key" , values.key );
-    formData.append( "value" , values.value );
-
-    const url = editId ? `edit/comment/${editId}` : "add/contactUS";
-
     try {
-      const { data } = await http.post(baseUrl + url, formData)
-      if (!data.status) throw data;
-      Notiflix.Notify.success(data.message);
-      setModal(false);
-      setEditId(null);
-      formik.resetForm();
+      const { data } = await http.post(baseUrl + `edit/comment/${id}`, {
+        status: e.target.value,
+      });
+      console.log({ data });
       fetch();
+      Notiflix.Notify.success(data.data);
     } catch (error) {
-      console.error({error});
+      console.error({ error });
     } finally {
       setSubLoading(false);
-    }
-  }
-  
-  async function handleRemoveBlog(truest) {
-    if (truest) {
-      setSubLoading(true);
-      try {
-        const {data} = await http.get(baseUrl + `delete/contactUS/${editId}`);
-        if (!data.status) throw data;
-        setDeleteWarningModal(false);
-        setEditId(null);
-        formik.resetForm();
-        fetch();
-        Notiflix.Notify.success(data.message);
-      } catch (error) {
-        console.error({ error });
-      } finally {
-        setSubLoading(false);
-      }
-    } else {
-      setDeleteWarningModal(true);
     }
   }
 
   return (
     <>
-      <PageTitle title="مدیریت تماس با ما">
-        <Button variant={'contained'} endIcon={<AddIcon />} onClick={() => setModal(true)}>ایجاد</Button>
-      </PageTitle>
+      <PageTitle title="مدیریت نظرات" />
 
-      
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead sx={{bgcolor:'gray.dark'}}>
+        <Table
+          sx={{ minWidth: 650 }}
+          aria-label="simple table"
+        >
+          <TableHead sx={{ bgcolor: "gray.dark" }}>
             <TableRow>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">ایجاد شده در</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عنوان</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">مقدار</TableCell>
-              <TableCell component={'th'} sx={{fontWeight:'bolder', fontSize:'1.1rem', color:'primary.light'}} align="right">عملیات</TableCell>
+              <TableCell
+                component={"th"}
+                sx={{
+                  fontWeight: "bolder",
+                  fontSize: "1.1rem",
+                  color: "primary.light",
+                }}
+                align="right"
+              >
+                ایجاد شده در
+              </TableCell>
+              <TableCell
+                component={"th"}
+                sx={{
+                  fontWeight: "bolder",
+                  fontSize: "1.1rem",
+                  color: "primary.light",
+                }}
+                align="right"
+              >
+                نام نظر دهنده
+              </TableCell>
+              <TableCell
+                component={"th"}
+                sx={{
+                  fontWeight: "bolder",
+                  fontSize: "1.1rem",
+                  color: "primary.light",
+                }}
+                align="right"
+              >
+                نظر
+              </TableCell>
+              <TableCell
+                component={"th"}
+                sx={{
+                  fontWeight: "bolder",
+                  fontSize: "1.1rem",
+                  color: "primary.light",
+                }}
+                align="right"
+              >
+                وضعیت نظر
+              </TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {list.map((row) => (
-              <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+              <TableRow
+                key={row.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
                 <TableCell align="right">
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
-                <TableCell align="right">{row.key}</TableCell>
-                <TableCell align="right">{row.value}</TableCell>
+                <TableCell align="right">{row.full_name}</TableCell>
+                <TableCell align="right">{row.comment}</TableCell>
                 <TableCell align="right">
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      setEditId(row.id);
-                      formik.setFieldValue('key', row.key)
-                      formik.setFieldValue('value', row.value)
-                      setModal(true);
-                    }}
-                  >
-                    ویرایش
-                  </Button>
-
-                  <Button
-                    variant="text"
-                    color="error"
-                    onClick={() => {
-                      setEditId(row.id);
-                      handleRemoveBlog(false);
-                    }}
-                  >
-                    حذف
-                  </Button>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      value={row.status}
+                      displayEmpty
+                      onChange={(e) => handleChangeStatus(e, row.id)}
+                      disabled={subLoading}
+                      sx={{
+                        minWidth: '100px',
+                        "*": {
+                          color: row.status === 'active' ? 'lightgreen' : row.status === 'reject' ? "#ff5050" : "yellow"
+                        }
+                      }}
+                    >
+                      <MenuItem
+                        value={"pending"}
+                      >
+                        در انتظار
+                      </MenuItem>
+                      <MenuItem
+                        value={"active"}
+                      >
+                        تایید
+                      </MenuItem>
+                      <MenuItem
+                        value={"reject"}
+                      >
+                        رد
+                      </MenuItem>
+                    </Select>
                 </TableCell>
               </TableRow>
             ))}
@@ -145,93 +163,6 @@ export default function CommentPage() {
         </Table>
         {loading && <Loader />}
       </TableContainer>
-
-      <ModalTemplate open={modal} size={600} onClose={()=>{
-        setModal(false);
-        setEditId(null);
-        formik.resetForm();
-      }}
-      >
-        <DialogTitle>{editId ? "ویرایش" : "ایجاد"} فیلد جدید تماس با ما</DialogTitle>
-
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
-              <Input
-                label={"عنوان"}
-                name={"key"}
-                value={formik.values["key"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["key"] && Boolean(formik.errors["key"])}
-                helperText={formik.touched["key"] && formik.errors["key"]}
-                required
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Input
-                label={"مقدار"}
-                name={"value"}
-                value={formik.values["value"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["value"] && Boolean(formik.errors["value"])}
-                helperText={formik.touched["value"] && formik.errors["value"]}
-                required
-                fullWidth
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions sx={{gap:1}}>
-          <Button onClick={()=>{
-            setModal(false);
-            setEditId(null);
-            formik.resetForm();
-          }} variant="outlined" disabled={subLoading} >انصراف</Button>
-          <Button disabled={subLoading} onClick={formik.handleSubmit} variant="contained" sx={{minWidth:'120px'}} >{editId ? "ویرایش" : "ثبت"}</Button>
-        </DialogActions>
-      </ModalTemplate>
-
-      
-      {/* DELETE WARNING MODAL */}
-      <ModalTemplate
-        open={deleteWarningModal}
-        onClose={() => {
-          setEditId(null);
-          formik.resetForm();
-          setDeleteWarningModal(false);
-        }}
-        size={320}
-      >
-        <DialogTitle>هشدار</DialogTitle>
-        <DialogContent>
-          <span>آیا از حذف این مقاله مطمئن هستید؟</span>
-        </DialogContent>
-        <DialogActions sx={{ gap: 1 }}>
-          <Button
-            onClick={() => {
-              setEditId(null);
-              formik.resetForm();
-              setDeleteWarningModal(false);
-            }}
-            disabled={subLoading}
-          >
-            انصراف
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            style={{ minWidth: "120px" }}
-            disabled={subLoading}
-            onClick={() => handleRemoveBlog(true)}
-          >
-            حذف
-          </Button>
-        </DialogActions>
-      </ModalTemplate>
     </>
-  )
+  );
 }
