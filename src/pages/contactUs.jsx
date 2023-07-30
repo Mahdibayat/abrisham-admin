@@ -39,6 +39,7 @@ export default function ContactUsPage() {
       phone3: "",
       phone4: "",
       phone5: "",
+      phone6: "",
       lat: "",
       long: "",
       address: "",
@@ -173,6 +174,25 @@ export default function ContactUsPage() {
             onBlur={formik.handleBlur}
             error={formik.touched["phone5"] && Boolean(formik.errors["phone5"])}
             helperText={formik.touched["phone5"] && formik.errors["phone5"]}
+            required
+            fullWidth
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={6}
+          md={4}
+          lg={3}
+        >
+          <Input
+            label={"شماره تماس 6"}
+            name={"phone6"}
+            value={formik.values["phone6"]}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched["phone6"] && Boolean(formik.errors["phone6"])}
+            helperText={formik.touched["phone6"] && formik.errors["phone6"]}
             required
             fullWidth
           />

@@ -158,7 +158,7 @@ export default function ServicesPage() {
                       navigate("./attr", {state : {id: row.id}})
                     }}
                   >
-                    زیرشاخه ها
+                    جزئیات خدمات
                   </Button>
                 </TableCell>
               </TableRow>

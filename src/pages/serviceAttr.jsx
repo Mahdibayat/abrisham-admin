@@ -7,6 +7,7 @@ import { baseUrl, baseUrlImage, http } from "../scripts/axiosMethods";
 import Notiflix from "notiflix";
 import PageTitle from "../components/pageTitle";
 import {
+  Box,
   Button,
   DialogActions,
   DialogContent,
@@ -24,10 +25,9 @@ import {
 import moment from "moment-jalaali";
 import Loader from "../components/loader/loader";
 import ModalTemplate from "../components/modal/modalTemplate";
-import UploadImage from "../components/uploadImage/uploadImage";
 import TextEditor from "../components/textEditor/textEditor";
-import WallpaperIcon from "@mui/icons-material/Wallpaper";
 import Input from "../components/Input/Input";
+import UploadMultiply from "../components/uploadImage/uploadMultiply";
 
 function ServiceAttr() {
   const location = useLocation();
@@ -38,7 +38,7 @@ function ServiceAttr() {
   const [images, setImages] = useState([]);
   const [modal, setModal] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [file, setFile] = useState(null);
+  const [files, setFile] = useState([]);
   const [mainServiceTitle, setMainServiceTitle] = useState("");
   const [editorValue, setEditorValue] = useState("");
   const [deleteWarningModal, setDeleteWarningModal] = useState(false);
@@ -55,18 +55,15 @@ function ServiceAttr() {
       const { data } = await http.get(
         baseUrl + `list/service/Atrr/${location.state.id}`
       );
-      setMainServiceTitle(data.serviceAtrr[0].service[0].title);
       setServices(data.serviceAtrr);
       setImages(data.images);
+      setMainServiceTitle(data.serviceAtrr?.[0]?.service?.[0]?.title || "");
     } catch (error) {
       console.error({ error });
     } finally {
       setLoading(false);
     }
   }
-
-  console.log({ services });
-  console.log({ images });
 
   const formik = useFormik({
     initialValues: {
@@ -84,7 +81,11 @@ function ServiceAttr() {
     formData.append("service_id", values.service_id);
     formData.append("title", values.title);
     formData.append("description", editorValue);
-    if (!!file) formData.append("image", file, file.name || "x");
+    if (!!files.length) {
+      Array.from(files).forEach(file => {
+        formData.append("images[]", file, file.name || "x");
+      })
+    } 
 
     const url = editId ? `edit/service/Atrr/${editId}` : "add/service/Atrr";
 
@@ -110,7 +111,6 @@ function ServiceAttr() {
         const { data } = await http.get(
           baseUrl + `delete/service/Atrr/${editId}`
         );
-        if (!data.status) throw data;
         setDeleteWarningModal(false);
         setEditId(null);
         fetch();
@@ -127,14 +127,17 @@ function ServiceAttr() {
 
   return (
     <>
-      <PageTitle title={`مدیریت زیرشاخه های سرویس "${mainServiceTitle}"`}>
-        <Button
-          endIcon={<AddIcon />}
-          variant="contained"
-          onClick={() => setModal(true)}
-        >
-          ایجاد زیرشاخه جدید
-        </Button>
+      <PageTitle title={`مدیریت جزئیات سرویس "${mainServiceTitle}"`}>
+        {
+          services.length < 1 &&
+            <Button
+              endIcon={<AddIcon />}
+              variant="contained"
+              onClick={() => setModal(true)}
+            >
+              ایجاد زیرشاخه جدید
+            </Button>
+        }
       </PageTitle>
 
       {/* TABLE */}
@@ -165,7 +168,7 @@ function ServiceAttr() {
                 }}
                 align="right"
               >
-                تصویر
+                تصاویر
               </TableCell>
               <TableCell
                 component={"th"}
@@ -213,21 +216,31 @@ function ServiceAttr() {
                   {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
                 <TableCell align="right">
-                  <img
-                    src={baseUrlImage + row.image}
-                    style={{
-                      width: "200px",
-                      height: "150px",
-                      objectFit: "cover",
-                    }}
-                    alt=""
-                  />
+                  <Box sx={{
+                    display: 'grid',
+                    maxWidth: '150px',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(50px, 1fr))',
+                    gap: '10px',
+                    img: {
+                      transition: 'all 800ms',
+                      ':hover': {
+                        transform: 'scale(2)'
+                      }
+                    }
+                  }}>
+                    {
+                      images.filter(img => img.model_id !== editId).map(img => {
+                        console.log({img})
+                        return <img  key={img.id} src={baseUrlImage + img.filename} alt='' style={{width: '100%', height: '50px', objectFit: 'cover', border: '1px solid blue', borderRadius: 1}} />  
+                      })
+                    }
+                  </Box>
                 </TableCell>
                 <TableCell align="center">{row.title}</TableCell>
                 <TableCell align="center">{row.description}</TableCell>
                 <TableCell align="right">
                   <Stack gap={1}>
-                    <Button
+                    {/* <Button
                       variant="text"
                       onClick={() => {
                         setEditId(row.id);
@@ -236,7 +249,7 @@ function ServiceAttr() {
                       color="error"
                     >
                       حذف
-                    </Button>
+                    </Button> */}
                     <Button
                       variant="text"
                       onClick={() => {
@@ -295,13 +308,8 @@ function ServiceAttr() {
               xs={12}
               sm={6}
             >
-              <UploadImage
-                setUploadedImage={setFile}
-                width="100%"
-                height="230px"
-                emptyIcon={
-                  <WallpaperIcon style={{ width: "100%", height: "100%" }} />
-                }
+              <UploadMultiply
+                setUploadedImages={setFile}
               />
             </Grid>
 
