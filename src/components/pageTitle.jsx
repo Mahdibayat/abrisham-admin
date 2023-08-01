@@ -5,8 +5,10 @@ function PageTitle(props) {
   return (
     <Stack direction={'row'} sx={{justifyContent:'space-between', alignItems:'center', p:1, py:2}}>
       <Typography component={'h1'} variant='h5' sx={{fontSize:'2rem'}}>{props.title}</Typography>
-
-      {props.children}
+      
+      <Stack direction={'row'} alignItems={'center'} gap={1}>
+        {props.children}  
+      </Stack>
     </Stack>
   )
 }

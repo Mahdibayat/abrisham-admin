@@ -6,12 +6,14 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
+  Pagination,
   Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableFooter,
   TableHead,
   TableRow,
 } from "@mui/material";
@@ -40,15 +42,28 @@ export default function BlogPage() {
   const defaultRef = useRef("");
   const [imageModal, setImageModal] = useState(false);
   const [deleteWarningModal, setDeleteWarningModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [pageData, setPageData] = useState({
+    current_page: 1,
+    next_page_url: null,
+    per_page: 10,
+    prev_page_url: null,
+    to: 3,
+    total: 3
+  });
 
   useEffect(() => {
     fetchList();
   }, []);
 
-  async function fetchList() {
+  async function fetchList(page) {
     setLoading(true);
+    let urlText = 'list/blog';
+    if(typeof page !== 'undefined' && !!page) {
+      urlText += `?page=${page}`
+    }
     try {
-      const { data } = await http.get(baseUrl + "list/blog");
+      const { data } = await http.get(baseUrl + urlText);
       handleCustomizeRes(data);
     } catch (error) {
       console.error({ error });
@@ -58,11 +73,13 @@ export default function BlogPage() {
   }
 
   function handleCustomizeRes(data) {
-    let blogs = data.Blogs;
+    let blogs = data.Blogs.data;
     let images = data.images;
+    setPage(data.Blogs.current_page)
+    setPageData(data.Blogs);
     let list = blogs.map((b) => ({
       ...b,
-      images: images.filter((i) => i.model_id !== b.id),
+      images: images.filter((i) => i.model_id == b.id),
     }));
     setList(list);
   }
@@ -84,6 +101,7 @@ export default function BlogPage() {
       setModal(false);
       setEditId(null);
       fetchList();
+      formik.resetForm();
       defaultRef.current = "";
       Notiflix.Notify.success(data.message);
     } catch (error) {
@@ -139,6 +157,10 @@ export default function BlogPage() {
     onSubmit: handleSubmit,
   });
 
+  async function handleChangePage(e, page) {
+    fetchList(page)
+  }
+
   return (
     <>
       {/* TITLE */}
@@ -187,6 +209,7 @@ export default function BlogPage() {
                         setEditId(row.id);
                         defaultRef.current = row.description;
                         formik.setFieldValue("title", row.title);
+                        formik.setFieldValue("read_time", row.read_time);
                         setModal(true);
                       }}
                     >
@@ -207,6 +230,22 @@ export default function BlogPage() {
               </TableRow>
             ))}
           </TableBody>
+
+          {
+            Math.ceil(Number(pageData.total) / Number(pageData.per_page)) > 1 &&
+            <TableFooter>
+              <TableCell colSpan={4}>
+                {console.log({pageData})}
+                <Stack spacing={2} justifyContent={'center'} alignItems={'center'}>
+                  <Pagination 
+                    disabled={loading} 
+                    count={Math.ceil(Number(pageData.total) / Number(pageData.per_page))} 
+                    page={page} onChange={handleChangePage} 
+                  />
+                </Stack>
+              </TableCell>
+          </TableFooter>
+          }
         </Table>
         {loading && <Loader />}
       </TableContainer>
@@ -293,7 +332,7 @@ export default function BlogPage() {
           </Button>
         </DialogActions>
       </ModalTemplate>
-
+                     
       {/* IMAGE MODAL */}
       <ModalTemplate
         open={imageModal}
@@ -301,18 +340,18 @@ export default function BlogPage() {
           setEditId(null);
           setImageModal(false);
         }}
-        size={800}
+        size={400}
       >
         <DialogTitle>مدیریت عکس های مقاله</DialogTitle>
         <DialogContent sx={{width:1}}>
           {!!editId && (
-            <Grid container sx={{width:1}} spacing={2}>
-              {!!list.find((b) => b.id === editId).images.length ?
-                list.find((b) => b.id === editId).images.map((img) => (
+            <Grid container sx={{width:1}}>
+              
+              {!!list.find((b) => b.id == editId).images.length ?
+                list.find((b) => b.id == editId).images.map((img) => (
                   <Grid
                     item
                     xs={12}
-                    sm={6}
                     key={img.id}
                     sx={{ height: "180px", width:1, position: "relative", border:'5px solid transparent' }}
                   >
