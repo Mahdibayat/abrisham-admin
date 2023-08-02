@@ -127,7 +127,7 @@ function ServiceAttr() {
 
   return (
     <>
-      <PageTitle title={`مدیریت جزئیات سرویس "${mainServiceTitle}"`}>
+      <PageTitle title={`مدیریت جزئیات خدمات "${mainServiceTitle}"`}>
         {
           services.length < 1 &&
             <Button
@@ -254,6 +254,7 @@ function ServiceAttr() {
                       variant="text"
                       onClick={() => {
                         setEditId(row.id);
+                        setEditorValue(row.description)
                         setModal(true);
                       }}
                     >

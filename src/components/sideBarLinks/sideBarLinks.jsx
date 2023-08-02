@@ -77,7 +77,7 @@ const SideBarLinks = ({ open }) => {
 
       <SideBarLink
         icon={<CleaningServicesIcon />}
-        title="سرویس ها"
+        title="خدمات"
         isOpen={open}
         to="/services"
         isActive={active === "/services"}

@@ -98,7 +98,7 @@ export default function ServicesPage() {
 
   return (
     <>
-      <PageTitle title="مدیریت سرویس ها">
+      <PageTitle title="مدیریت خدمات">
         <Button variant={'contained'} endIcon={<AddIcon />} onClick={() => setModal(true)}>ایجاد</Button>
       </PageTitle>
 
@@ -175,7 +175,7 @@ export default function ServicesPage() {
         }}
         size={1000}
       >
-        <DialogTitle>{editId ? "ویرایش": "ثبت"} سرویس</DialogTitle>
+        <DialogTitle>{editId ? "ویرایش": "ثبت"} خدمت</DialogTitle>
 
         <DialogContent>
           <Grid container spacing={2}>
@@ -193,7 +193,7 @@ export default function ServicesPage() {
               />
 
               <Stack direction={'row'} gap={1} alignItems={'center'} mt={5}>
-                <Typography>وضعیت سرویس : </Typography>
+                <Typography>وضعیت خدمت : </Typography>
                 <CustomSwitch falseText="غیر فعال" size="lg" trueText="فعال" value={formik.values.status} setValue={(e) => formik.setFieldValue('status', e)} />
               </Stack>
             </Grid>
@@ -260,7 +260,7 @@ export default function ServicesPage() {
         }}
         size={1000}
       >
-        <DialogTitle>مدیریت زیرشاخه های سرویس</DialogTitle>
+        <DialogTitle>مدیریت زیرشاخه های خدمت</DialogTitle>
 
         <DialogContent>
 
