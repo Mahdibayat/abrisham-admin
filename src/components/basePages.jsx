@@ -135,10 +135,9 @@ const BasePages = () => {
             <Typography>
               طراحی و اجرا{" "}
               <Typography component={"a"} sx={{color:'primary.main', textDecoration:'unset'}}
-                href="#"
+                href="mailto:mahdibayat72@hotmail.com"
                 // target="_blank"
                 rel="noreferrer"
-
               >
                 Mahdi Bayat
                 </Typography>

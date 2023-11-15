@@ -28,7 +28,7 @@ import Loader from "../components/loader/loader";
 import Input from "../components/Input/Input";
 import UploadImage from "../components/uploadImage/uploadImage";
 import CropOriginalIcon from "@mui/icons-material/CropOriginal";
-import TextEditor from "../components/textEditor/textEditor";
+import SunEditor, { buttonList } from 'suneditor-react';
 import moment from "moment-jalaali";
 
 export default function BlogPage() {
@@ -38,7 +38,7 @@ export default function BlogPage() {
   const [editId, setEditId] = useState(null);
   const [modal, setModal] = useState(false);
   const [image, setImage] = useState(null);
-  const [editor, setEditorValue] = useState("");
+  // const [editor, setEditorValue] = useState("");
   const defaultRef = useRef("");
   const [imageModal, setImageModal] = useState(false);
   const [deleteWarningModal, setDeleteWarningModal] = useState(false);
@@ -51,6 +51,7 @@ export default function BlogPage() {
     to: 3,
     total: 3
   });
+  const editor = useRef();
 
   useEffect(() => {
     fetchList();
@@ -90,7 +91,7 @@ export default function BlogPage() {
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("read_time", values.read_time);
-    if (editor) formData.append("description", editor);
+    if (editor.current) formData.append("description", editor.current.getContents());
     if (image) formData.append("images[]", image, image.name);
 
     let url = editId ? `edit/blog/${editId}` : "add/blog" 
@@ -160,6 +161,13 @@ export default function BlogPage() {
   async function handleChangePage(e, page) {
     fetchList(page)
   }
+
+  function imageUploadHandler(xmlHttpRequest, info, core){
+    console.log(xmlHttpRequest, info, core)
+  }
+  const getSunEditorInstance = (sunEditor) => {
+    editor.current = sunEditor;
+  };
 
   return (
     <>
@@ -301,9 +309,18 @@ export default function BlogPage() {
             </Grid>
 
             <Grid item xs={12} mt={2}>
-              <TextEditor
+              {/* <TextEditor
                 setEditorValue={setEditorValue}
                 defaultValue={defaultRef.current || "<h3 style='text-align:center;'>متن مقاله را وارد کنید</h3>"}
+              /> */}
+              <SunEditor
+                defaultValue={defaultRef.current}
+                placeholder="متن مقاله خود را وارد کنید..."
+                imageUploadHandler={imageUploadHandler}
+                setOptions={{
+                  buttonList: buttonList.complex 
+                }}
+                getSunEditorInstance={getSunEditorInstance}
               />
             </Grid>
           </Grid>
