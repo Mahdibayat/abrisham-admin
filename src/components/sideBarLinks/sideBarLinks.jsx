@@ -16,6 +16,7 @@ import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import QuizIcon from '@mui/icons-material/Quiz';
 import ImagesearchRollerIcon from '@mui/icons-material/ImagesearchRoller';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 const SideBarLinks = ({ open }) => {
   const location = useLocation();
@@ -97,6 +98,14 @@ const SideBarLinks = ({ open }) => {
         isOpen={open}
         to="/faq"
         isActive={active === "/faq"}
+      />
+
+      <SideBarLink
+        icon={<AddShoppingCartIcon />}
+        title="سفارشات"
+        isOpen={open}
+        to="/orders"
+        isActive={active === "/orders"}
       />
     </div>
   );

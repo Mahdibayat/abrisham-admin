@@ -16,6 +16,7 @@ const SocialMediaPage = lazy(() => import("./pages/socialMedia"));
 const ContactUsPage = lazy(() => import("./pages/contactUs"));
 const CommentPage = lazy(() => import("./pages/comment"));
 const FaqPage = lazy(() => import("./pages/faqPage"));
+const OrdersPage = lazy(() => import("./pages/orders"));
 // const SocialMediaPage = lazy(() => import("./pages/socialMedia"));
 
 function App() {
@@ -93,6 +94,7 @@ function App() {
           <Route path="/services/attr" element={suspenseWarper(<ServicesAttrPage />)} /> 
           <Route path="/comment" element={suspenseWarper(<CommentPage />)} /> 
           <Route path="/faq" element={suspenseWarper(<FaqPage />)} /> 
+          <Route path="/orders" element={suspenseWarper(<OrdersPage />)} /> 
           <Route path="*" element={suspenseWarper(<Page404 />)} />
         </Route>
         <Route path="/login" element={suspenseWarper(<LoginPage />)} />

@@ -16,20 +16,22 @@ import {
   TableFooter,
   TableHead,
   TableRow,
+  TextField,
+  IconButton
 } from "@mui/material";
-import { useFormik } from "formik";
 import Notiflix from "notiflix";
 import { useEffect, useRef, useState } from "react";
 import ModalTemplate from "../components/modal/modalTemplate";
 import PageTitle from "../components/pageTitle";
 import { baseUrl, baseUrlImage, http } from "../scripts/axiosMethods";
-import { blogValidator } from "../scripts/validators";
 import Loader from "../components/loader/loader";
-import Input from "../components/Input/Input";
 import UploadImage from "../components/uploadImage/uploadImage";
 import CropOriginalIcon from "@mui/icons-material/CropOriginal";
 import SunEditor, { buttonList } from 'suneditor-react';
 import moment from "moment-jalaali";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 export default function BlogPage() {
   const [list, setList] = useState([]);
@@ -52,10 +54,24 @@ export default function BlogPage() {
     total: 3
   });
   const editor = useRef();
+  const {handleSubmit, control, reset, setValue} = useForm({
+    defaultValues: {
+      title: "",
+      description: "",
+      read_time: "",
+      keywords: [],
+    }
+  })
+
+  const {append,fields, remove,update } = useFieldArray({
+    control,
+    name: 'keywords',
+    rules: { maxLength: 5 }
+  })
 
   useEffect(() => {
     fetchList();
-  }, []);
+  }, [])
 
   async function fetchList(page) {
     setLoading(true);
@@ -85,7 +101,7 @@ export default function BlogPage() {
     setList(list);
   }
 
-  async function handleSubmit(values) {
+  async function submit(values) {
     setSubLoading(true);
 
     const formData = new FormData();
@@ -94,6 +110,13 @@ export default function BlogPage() {
     if (editor.current) formData.append("description", editor.current.getContents());
     if (image) formData.append("images[]", image, image.name);
 
+    if(values.keywords.length) {
+      console.log({values})
+      const keywords = values.keywords.join(", ")
+      console.log({keywords})
+      formData.append("keywords", keywords);
+    }
+    
     let url = editId ? `edit/blog/${editId}` : "add/blog" 
 
     try {
@@ -102,7 +125,7 @@ export default function BlogPage() {
       setModal(false);
       setEditId(null);
       fetchList();
-      formik.resetForm();
+      reset();
       defaultRef.current = "";
       Notiflix.Notify.success(data.message);
     } catch (error) {
@@ -147,16 +170,6 @@ export default function BlogPage() {
       setSubLoading(false);
     }
   }
-
-  const formik = useFormik({
-    initialValues: {
-      title: "",
-      description: "",
-      read_time: ""
-    },
-    validationSchema: blogValidator,
-    onSubmit: handleSubmit,
-  });
 
   async function handleChangePage(e, page) {
     fetchList(page)
@@ -213,11 +226,18 @@ export default function BlogPage() {
                     <Button
                       variant="text"
                       onClick={() => {
-                        console.log(row);
                         setEditId(row.id);
                         defaultRef.current = row.description;
-                        formik.setFieldValue("title", row.title);
-                        formik.setFieldValue("read_time", row.read_time);
+                        setValue("title", row.title)
+                        setValue("read_time", row.read_time);
+                        if(row.keywords) {
+                          const arrayMap = row.keywords.split(", ");
+                          console.log({arrayMap})
+                          arrayMap.forEach((key,i) => {
+                            setValue(`keywords[${i}]`, key);
+                            update(`keywords[${i}]`, key)
+                          })
+                        }
                         setModal(true);
                       }}
                     >
@@ -264,90 +284,145 @@ export default function BlogPage() {
         onClose={() => {
           setModal(false);
           defaultRef.current = "";
+          update([]);
         }}
         size={1000}
       >
         <DialogTitle>{editId ? "ویرایش" : "اضافه کردن"} مقاله</DialogTitle>
+        <form
+          onSubmit={handleSubmit(submit)}
+        >
+          <DialogContent>
+            <Grid container spacing={1} columnSpacing={3}>
+              <Grid item xs={12} md={6}>
 
-        <DialogContent>
-          <Grid container spacing={1} columnSpacing={3}>
-            <Grid item xs={12} md={6}>
-              <Input
-                label={"عنوان مقاله"}
-                name={"title"}
-                value={formik.values["title"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["title"] && Boolean(formik.errors["title"])}
-                helperText={formik.touched["title"] && formik.errors["title"]}
-                required
-                fullWidth
-              />
+                <Controller
+                  control={control}
+                  name="title"
+                  rules={{
+                    required: 'عنوان اجباری است',
+                  }}
+                  render={({ field, fieldState: {error} }) => (
+                    <TextField 
+                      {...field} 
+                      label='عنوان مقاله'
+                      error={!!error}
+                      helperText={error?.message}
+                      fullWidth
+                    />
+                  )}
+                />
 
-              <Input
-                label={"مدت زمان خواندن پروژه"}
-                name={"read_time"}
-                value={formik.values["read_time"]}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={formik.touched["read_time"] && Boolean(formik.errors["read_time"])}
-                helperText={formik.touched["read_time"] && formik.errors["read_time"]}
-                placeholder={'عدد به دقیقه وارد شود'}
-                type='number'
-                required
-                fullWidth
-              />
+                <Controller
+                  control={control}
+                  name="read_time"
+                  rules={{
+                    required: 'مدت زمان خواندن پروژه را وارد کنید',
+                  }}
+                  render={({ field, fieldState: {error} }) => (
+                    <TextField 
+                      {...field} 
+                      label='مدت زمان خواندن پروژه'
+                      error={!!error}
+                      helperText={error?.message}
+                      fullWidth
+                      type="number"
+                    />
+                  )}
+                />
+
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <UploadImage
+                  emptyIcon={<CropOriginalIcon style={{ width: "100%", height: "100%" }} />}
+                  height="180px"
+                  width="100%"
+                  setUploadedImage={setImage}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <Grid container spacing={1} alignItems={'center'}>
+                  {fields.map((field, index) => (
+                    <Grid item xs={12} sm={4} md={3} key={field.id} sx={{position:'relative'}}>
+                      <Controller
+                        control={control}
+                        name={`keywords.${index}`}
+                        rules={{
+                          required: 'وارد کردن حداقل یک کلمه کلیدی اجباری است',
+                        }}
+                        render={({ field, fieldState: {error} }) => (
+                          <TextField 
+                            {...field} 
+                            label={`کلمه کلیدی (SEO) ${index + 1}`}
+                            error={!!error}
+                            helperText={error?.message}
+                            fullWidth
+                          />
+                        )}
+                      />
+                      <IconButton 
+                        onClick={() => remove(index)}
+                        sx={{
+                          position:'absolute',
+                          top: 0,
+                          left: 0,
+                          opacity: .5,
+                          color: 'error.main'
+                        }}
+                      >
+                        <RemoveCircleOutlineIcon />
+                      </IconButton>
+                    </Grid>
+                  ))}
+                  <Grid item xs={12} sm={4} md={3}>
+                    <Button onClick={()=>append("")} variant="outlined" size="large" fullWidth endIcon={<ControlPointIcon />}>اضافه کردن کلمه کلیدی</Button>
+                  </Grid>
+                </Grid>
+              </Grid>
+
+              <Grid item xs={12} mt={2}>
+                {/* <TextEditor
+                  setEditorValue={setEditorValue}
+                  defaultValue={defaultRef.current || "<h3 style='text-align:center;'>متن مقاله را وارد کنید</h3>"}
+                /> */}
+                <SunEditor
+                  defaultValue={defaultRef.current}
+                  placeholder="متن مقاله خود را وارد کنید..."
+                  imageUploadHandler={imageUploadHandler}
+                  setOptions={{
+                    buttonList: buttonList.complex 
+                  }}
+                  getSunEditorInstance={getSunEditorInstance}
+                />
+              </Grid>
             </Grid>
+          </DialogContent>
 
-            <Grid item xs={12} md={6}>
-              <UploadImage
-                emptyIcon={<CropOriginalIcon style={{ width: "100%", height: "100%" }} />}
-                height="180px"
-                width="100%"
-                setUploadedImage={setImage}
-              />
-            </Grid>
+          <DialogActions sx={{ gap: 1 }}>
+            <Button
+              onClick={() => {
+                setModal(false);
+                defaultRef.current = "";
+                reset();
+              }}
+              disabled={subLoading}
+              variant="outlined"
+            >
+              انصراف
+            </Button>
 
-            <Grid item xs={12} mt={2}>
-              {/* <TextEditor
-                setEditorValue={setEditorValue}
-                defaultValue={defaultRef.current || "<h3 style='text-align:center;'>متن مقاله را وارد کنید</h3>"}
-              /> */}
-              <SunEditor
-                defaultValue={defaultRef.current}
-                placeholder="متن مقاله خود را وارد کنید..."
-                imageUploadHandler={imageUploadHandler}
-                setOptions={{
-                  buttonList: buttonList.complex 
-                }}
-                getSunEditorInstance={getSunEditorInstance}
-              />
-            </Grid>
-          </Grid>
-        </DialogContent>
-
-        <DialogActions sx={{ gap: 1 }}>
-          <Button
-            onClick={() => {
-              setModal(false);
-              defaultRef.current = "";
-              formik.resetForm();
-            }}
-            disabled={subLoading}
-            variant="outlined"
-          >
-            انصراف
-          </Button>
-
-          <Button
-            variant="contained"
-            onClick={() => formik.handleSubmit()}
-            style={{ minWidth: "120px" }}
-            disabled={subLoading}
-          >
-            {editId ? "ویرایش": "ثبت"}
-          </Button>
-        </DialogActions>
+            <Button
+              variant="contained"
+              type={'submit'}
+              style={{ minWidth: "120px" }}
+              disabled={subLoading}
+            >
+              {editId ? "ویرایش": "ثبت"}
+            </Button>
+          </DialogActions>
+        </form>
       </ModalTemplate>
                      
       {/* IMAGE MODAL */}
