@@ -90,7 +90,11 @@ const BasePages = () => {
         </Box>
       </Stack>
 
-      <Grid container>
+      <Grid container
+        sx={{
+          width: 1,
+        }}
+      >
         {/* HEADER */}
         <Grid
           item
@@ -112,7 +116,11 @@ const BasePages = () => {
           </IconButton>
         </Grid>
 
-        <Grid item xs={12} sx={{ mx: "5px", height: "calc(100vh - 80px)", overflow: "auto" }}>
+        <Grid item xs={12} sx={{ 
+          mx: "5px", 
+          height: "calc(100vh - 80px)", 
+          overflow: "auto",
+        }}>
           <Outlet />
         </Grid>
 

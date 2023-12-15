@@ -115,7 +115,7 @@ export default function FaqPage() {
             {list.map((row) => (
               <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell align="right">
-                  {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
+                  {moment(row.created_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
                 <TableCell align="right">{row.priority}</TableCell>
                 <TableCell align="right">{row.question}</TableCell>

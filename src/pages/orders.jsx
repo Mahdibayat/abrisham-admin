@@ -25,7 +25,7 @@ export default function OrdersPage() {
       setLoading(false);
     }
   }
-
+  
   async function changeNavStatus(id, value) {
     setLoading(true);
     try {
@@ -120,7 +120,7 @@ export default function OrdersPage() {
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
                 <TableCell align="right">
-                  {moment(row.create_at).format("jYYYY/jMM/jDD HH:mm")}
+                  {moment(row.created_at).format("jYYYY/jMM/jDD HH:mm")}
                 </TableCell>
                 <TableCell align="right">{row.full_name}</TableCell>
                 <TableCell align="right">{row.mobile}</TableCell>
